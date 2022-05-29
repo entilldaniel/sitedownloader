@@ -13,6 +13,8 @@ Will build everything for you.
 
 ## How to run
 The artifact is named tretton37.jar  
-```java -jar target/tretton37.jar```  
-Currently, when the program is started it will ask you for a URL to download from and
-save the contents to a folder named `download`. 
+```java -jar target/sitedownloader-jar-with-dependencies.jar```  
+  
+The program takes two arguments:
+ - -u or --url for the url to start downloading from
+ - -d or --destination the target folder to download to.
