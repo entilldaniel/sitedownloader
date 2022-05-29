@@ -44,7 +44,7 @@ class DiskWriterTest {
         var contents = "hello, World!";
         var test = new ByteArrayInputStream(contents.getBytes(StandardCharsets.UTF_8));
         var dw = new DiskWriter(BASE_PATH);
-        dw.write("index.html", test);
+        dw.write(Path.of("index.html"), test);
 
         String s = Files.readString(BASE_PATH.resolve("index.html"));
         assertEquals(contents, s);
@@ -55,7 +55,7 @@ class DiskWriterTest {
     void writeToFileInDepth() throws IOException {
         var contents = "hello, World!";
         var test = new ByteArrayInputStream(contents.getBytes(StandardCharsets.UTF_8));
-        String path = "a/b/c/index.html";
+        Path path = Path.of("a/b/c/index.html");
 
         var dw = new DiskWriter(BASE_PATH);
         dw.write(path, test);

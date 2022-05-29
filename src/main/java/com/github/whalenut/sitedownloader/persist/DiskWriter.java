@@ -3,7 +3,6 @@ package com.github.whalenut.sitedownloader.persist;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -19,8 +18,8 @@ public class DiskWriter {
         basePath.toFile().mkdirs();
     }
 
-    public void write(String path, InputStream stream) throws IOException {
-        File file = Paths.get(basePath.toString(), path).toFile();
+    public void write(Path path, InputStream stream) throws IOException {
+        File file = Paths.get(basePath.toString(), path.toString()).toFile();
         file.getParentFile().mkdirs();
         file.createNewFile();
 

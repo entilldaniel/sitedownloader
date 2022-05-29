@@ -9,7 +9,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.file.Path;
-import java.util.List;
 
 import static java.net.http.HttpResponse.BodyHandlers.ofInputStream;
 
@@ -19,10 +18,12 @@ public class HttpDownloader {
 
     private final HttpClient client;
     private final DiskWriter writer;
+    private final FilePathCreator filePathCreator;
 
-    public HttpDownloader(HttpClient client, DiskWriter writer) {
+    public HttpDownloader(HttpClient client, DiskWriter writer, FilePathCreator filePathCreator) {
         this.client = client;
         this.writer = writer;
+        this.filePathCreator = filePathCreator;
     }
 
     public InputStream download(URI uri) throws IOException, InterruptedException {
@@ -33,17 +34,12 @@ public class HttpDownloader {
 
         HttpResponse<InputStream> response = client.send(request, ofInputStream());
 
-
         //TODO: handle types!
         String contentType = response.headers()
                 .firstValue(CONTENT_TYPE)
                 .orElse("unknown");
 
-        String path = uri.getPath();
-        if (path.isBlank()) {
-            path = "index.html";
-        }
-
+        Path path = filePathCreator.build(Path.of(uri.getPath()), contentType);
         writer.write(path, response.body());
 
         return response.body();

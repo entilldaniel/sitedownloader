@@ -1,11 +1,13 @@
 package com.github.whalenut.sitedownloader;
 
 
+import com.github.whalenut.sitedownloader.download.FilePathCreator;
 import com.github.whalenut.sitedownloader.download.HttpDownloader;
 import com.github.whalenut.sitedownloader.persist.DiskWriter;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -30,7 +32,8 @@ public class SiteDownloader implements Runnable{
                     .followRedirects(HttpClient.Redirect.ALWAYS)
                     .build();
             var writer = new DiskWriter(path);
-            var downloader = new HttpDownloader(client, writer);
+            var pathCreator = new FilePathCreator();
+            var downloader = new HttpDownloader(client, writer, pathCreator);
 
             downloader.download(url);
         } catch (IOException | InterruptedException e) {

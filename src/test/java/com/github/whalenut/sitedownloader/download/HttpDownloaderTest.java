@@ -9,11 +9,11 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpHeaders;
 import java.net.http.HttpResponse;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -24,9 +24,9 @@ public class HttpDownloaderTest {
     void testDownload() throws IOException, InterruptedException {
         var client = mock(HttpClient.class);
         var writer = mock(DiskWriter.class);
-        var downloader = new HttpDownloader(client, writer);
-        var response = mock(HttpResponse.class);
+        var pathCreator = new FilePathCreator();
 
+        var response = mock(HttpResponse.class);
         when(client.send(any(), any())).thenReturn(response);
         InputStream resource = this.getClass().getClassLoader().getResourceAsStream("index.html");
         when(response.body()).thenReturn(resource);
@@ -35,9 +35,11 @@ public class HttpDownloaderTest {
                 (a, b) -> true);
         when(response.headers()).thenReturn(headers);
 
+        var downloader = new HttpDownloader(client, writer, pathCreator);
+
         InputStream download = downloader.download(URI.create("https://foo.com"));
 
-        verify(writer).write("index.html", download);
+        verify(writer).write(Path.of("index.html"), download);
     }
 
 
