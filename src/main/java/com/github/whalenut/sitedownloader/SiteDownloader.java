@@ -2,13 +2,14 @@ package com.github.whalenut.sitedownloader;
 
 
 import com.github.whalenut.sitedownloader.download.HttpDownloader;
-import picocli.CommandLine;
+import com.github.whalenut.sitedownloader.persist.DiskWriter;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.nio.file.Path;
 
 @Command(name = "SiteDownloader",
 mixinStandardHelpOptions = true,
@@ -17,21 +18,20 @@ description = "Downloads a site recursively to a specified folder.")
 public class SiteDownloader implements Runnable{
 
     @Option(names = {"-d", "--destination"}, description = "The destination of the downloaded site.", paramLabel = "DESTINATION")
-    private File file;
+    private Path path;
 
     @Option(names = {"-u", "--url"}, description = "The URL to start downloading from.", required = true, paramLabel = "URL")
     private URI url;
 
-    private final HttpDownloader downloader;
-
-    public SiteDownloader(HttpDownloader downloader) {
-        this.downloader = downloader;
-
-    }
-
     @Override
     public void run() {
         try {
+            var client = HttpClient.newBuilder()
+                    .followRedirects(HttpClient.Redirect.ALWAYS)
+                    .build();
+            var writer = new DiskWriter(path);
+            var downloader = new HttpDownloader(client, writer);
+
             downloader.download(url);
         } catch (IOException | InterruptedException e) {
             //TODO: clean up and do error handling.

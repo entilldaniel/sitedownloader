@@ -1,5 +1,6 @@
 package com.github.whalenut.sitedownloader.download;
 
+import com.github.whalenut.sitedownloader.persist.DiskWriter;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -11,9 +12,10 @@ import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class HttpDownloaderTest {
@@ -21,7 +23,8 @@ public class HttpDownloaderTest {
     @Test
     void testDownload() throws IOException, InterruptedException {
         var client = mock(HttpClient.class);
-        var downloader = new HttpDownloader(client);
+        var writer = mock(DiskWriter.class);
+        var downloader = new HttpDownloader(client, writer);
         var response = mock(HttpResponse.class);
 
         when(client.send(any(), any())).thenReturn(response);
@@ -34,7 +37,7 @@ public class HttpDownloaderTest {
 
         InputStream download = downloader.download(URI.create("https://foo.com"));
 
-        assertEquals(resource, download);
+        verify(writer).write("index.html", download);
     }
 
 
