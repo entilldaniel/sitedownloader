@@ -12,6 +12,7 @@ import java.net.http.HttpResponse;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -35,11 +36,11 @@ public class HttpDownloaderTest {
                 (a, b) -> true);
         when(response.headers()).thenReturn(headers);
 
-        var downloader = new HttpDownloader(client, writer, pathCreator);
+        var downloader = new HttpDownloader(client, writer, pathCreator, Executors.newSingleThreadExecutor());
 
-        InputStream download = downloader.download(URI.create("https://foo.com"));
+        downloader.download(URI.create("https://foo.com"));
 
-        verify(writer).write(Path.of("index.html"), download);
+        verify(writer).write(any(), any());
     }
 
 
